@@ -1,0 +1,21 @@
+{
+	"name": "mp3-discord-bot",
+	"version": "1.0.0",
+	"main": "/bot/index.js",
+	"scripts": {
+		"dev": "nodemon ./bot/index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"@discordjs/voice": "^0.19.0",
+		"@snazzah/davey": "^0.1.7",
+		"discord.js": "^14.22.1",
+		"dotenv": "^17.2.2",
+		"ffmpeg-static": "^5.2.0",
+		"node-fetch": "^2.7.0"
+	}
+}
