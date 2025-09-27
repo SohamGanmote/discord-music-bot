@@ -68,6 +68,16 @@ const playNext = (voiceChannel) => {
 	});
 
 	if (textChannel) textChannel.send(`🎵 Now playing: **${song}**`);
+	// 🎵 Set rich presence
+	message.client.user.setPresence({
+		activities: [
+			{
+				name: song,
+				type: 2, // 2 = LISTENING
+			},
+		],
+		status: "online",
+	});
 };
 
 const addToQueue = (songs, voiceChannel, channel) => {
