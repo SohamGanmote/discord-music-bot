@@ -42,12 +42,12 @@ module.exports = {
 				new ButtonBuilder()
 					.setCustomId("prev")
 					.setLabel("Prev")
-					.setStyle(ButtonStyle.Primary)
+					.setStyle(ButtonStyle.Secondary)
 					.setDisabled(currentPage === 0),
 				new ButtonBuilder()
 					.setCustomId("next")
 					.setLabel("Next")
-					.setStyle(ButtonStyle.Primary)
+					.setStyle(ButtonStyle.Secondary)
 					.setDisabled(currentPage === totalPages - 1)
 			);
 
