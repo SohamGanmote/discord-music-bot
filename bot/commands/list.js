@@ -17,7 +17,7 @@ module.exports = {
 			const end = start + itemsPerPage;
 			const fileList = files
 				.slice(start, end)
-				.map((file, index) => ``${start + index + 1}.` ${file}`)
+				.map((file, index) => `**${start + index + 1}.** ${file}`)
 				.join("\n");
 
 			return new EmbedBuilder()
@@ -66,4 +66,5 @@ module.exports = {
 		});
 	},
 };
+
 
