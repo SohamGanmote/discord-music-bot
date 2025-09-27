@@ -7,10 +7,10 @@ A simple Discord bot that can play MP3 files in voice channels. Upload your favo
 ## Available Commands
 
 - 🎵 **!play [number|name]** - Play a song by its number in the list or by its filename
-- ⏭ **!skip** - Skip the current song
+- ⏩ **!skip** - Skip the current song
 - 🛑 **!stop** - Stop playback and disconnect the bot
 - 📜 **!list** - List all available music files
-
+- 🎶 **!queue** - Show all queued songs
 ---
 
 ## Setup Instructions
@@ -50,3 +50,4 @@ Watch this video for a step-by-step setup guide:
 ---
 
 Enjoy your music bot! 🎶
+
