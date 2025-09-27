@@ -1,59 +1,71 @@
-// Inside your play command, after you start a song
-const {
-	joinVoiceChannel,
-	createAudioPlayer,
-	createAudioResource,
-} = require("@discordjs/voice");
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const path = require("path");
 
-module.exports = {
-	name: "play",
-	run: async (message, args) => {
-		if (!args.length) {
-			return message.channel.send(
-				"❌ Please provide the song number from !list"
-			);
-		}
+const queue = new Map();
+const musicFolder = path.join(__dirname, "..", "music");
 
-		// Example: get song file from your music folder
-		const songNumber = parseInt(args[0]);
-		const fs = require("fs");
-		const { musicFolder } = require("../utils/musicPlayer");
-		const files = fs.readdirSync(musicFolder).filter((f) => f.endsWith(".mp3"));
+function addToQueue(songs, voiceChannel, textChannel) {
+	const serverQueue = queue.get(voiceChannel.guild.id) || {
+		songs: [],
+		player: createAudioPlayer(),
+		connection: null,
+		textChannel,
+	};
+	serverQueue.songs.push(...songs);
 
-		if (isNaN(songNumber) || songNumber < 1 || songNumber > files.length) {
-			return message.channel.send("❌ Invalid song number.");
-		}
+	// Save queue
+	queue.set(voiceChannel.guild.id, serverQueue);
 
-		const song = files[songNumber - 1];
-		const filePath = path.join(musicFolder, song);
-
-		// join voice channel
-		if (!message.member.voice.channel)
-			return message.channel.send("❌ You must join a voice channel first!");
-		const connection = joinVoiceChannel({
-			channelId: message.member.voice.channel.id,
-			guildId: message.guild.id,
-			adapterCreator: message.guild.voiceAdapterCreator,
+	// If nothing is playing, start immediately
+	if (!serverQueue.connection) {
+		serverQueue.connection = joinVoiceChannel({
+			channelId: voiceChannel.id,
+			guildId: voiceChannel.guild.id,
+			adapterCreator: voiceChannel.guild.voiceAdapterCreator,
 		});
 
-		// play audio
-		const player = createAudioPlayer();
-		const resource = createAudioResource(filePath);
-		connection.subscribe(player);
-		player.play(resource);
+		serverQueue.connection.subscribe(serverQueue.player);
+		playNext(voiceChannel.guild.id);
+	}
+}
 
-		message.channel.send(`🎶 Now playing: **${song}**`);
+function playNext(guildId) {
+	const serverQueue = queue.get(guildId);
+	if (!serverQueue) return;
 
-		// 🎵 Set rich presence
-		message.client.user.setPresence({
-			activities: [
-				{
-					name: song,
-					type: 2, // 2 = LISTENING
-				},
-			],
+	const song = serverQueue.songs.shift();
+	if (!song) {
+		// Nothing left → reset presence
+		serverQueue.textChannel.client.user.setPresence({
+			activities: [],
 			status: "online",
 		});
-	},
-};
+		serverQueue.player.stop();
+		queue.delete(guildId);
+		return;
+	}
+
+	const resource = createAudioResource(path.join(musicFolder, song));
+	serverQueue.player.play(resource);
+
+	// Announce now playing
+	serverQueue.textChannel.send(`🎶 Now playing: **${song}**`);
+
+	// ✅ Update bot presence (Rich Presence)
+	serverQueue.textChannel.client.user.setPresence({
+		activities: [
+			{
+				name: song,
+				type: 2, // LISTENING
+			},
+		],
+		status: "online",
+	});
+
+	// When song ends, play next
+	serverQueue.player.once(AudioPlayerStatus.Idle, () => {
+		playNext(guildId);
+	});
+}
+
+module.exports = { musicFolder, addToQueue };
