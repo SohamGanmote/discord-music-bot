@@ -67,17 +67,19 @@ const playNext = (voiceChannel) => {
 		playNext(voiceChannel);
 	});
 
-	if (textChannel) textChannel.send(`🎵 Now playing: **${song}**`);
-	// 🎵 Set rich presence
-	message.client.user.setPresence({
-		activities: [
-			{
-				name: song,
-				type: 2, // 2 = LISTENING
-			},
-		],
-		status: "online",
-	});
+	if (textChannel) {
+		textChannel.send(`🎵 Now playing: **${song}**`);
+		// ✅ Set rich presence using textChannel.client
+		textChannel.client.user.setPresence({
+			activities: [
+				{
+					name: song,
+					type: 2, // LISTENING
+				},
+			],
+			status: "online",
+		});
+	}
 };
 
 const addToQueue = (songs, voiceChannel, channel) => {
@@ -108,3 +110,4 @@ module.exports = {
 	stopPlayback,
 	queue,
 };
+
