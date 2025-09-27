@@ -17,7 +17,7 @@ module.exports = {
 			const end = start + itemsPerPage;
 			const fileList = files
 				.slice(start, end)
-				.map((file, index) => `\`${start + index + 1}.\` 🎵 ${file}`)
+				.map((file, index) => ``${start + index + 1}.` ${file}`)
 				.join("\n");
 
 			return new EmbedBuilder()
@@ -31,12 +31,12 @@ module.exports = {
 			new ActionRowBuilder().addComponents(
 				new ButtonBuilder()
 					.setCustomId("prev")
-					.setLabel("⬅️ Prev")
+					.setLabel("Prev")
 					.setStyle(ButtonStyle.Secondary)
 					.setDisabled(currentPage === 0),
 				new ButtonBuilder()
 					.setCustomId("next")
-					.setLabel("Next ➡️")
+					.setLabel("Next")
 					.setStyle(ButtonStyle.Secondary)
 					.setDisabled(currentPage === totalPages - 1)
 			);
@@ -66,3 +66,4 @@ module.exports = {
 		});
 	},
 };
+
