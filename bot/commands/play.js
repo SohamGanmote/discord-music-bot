@@ -1,44 +1,59 @@
-const fs = require("fs");
+// Inside your play command, after you start a song
+const {
+	joinVoiceChannel,
+	createAudioPlayer,
+	createAudioResource,
+} = require("@discordjs/voice");
 const path = require("path");
-const { musicFolder, addToQueue } = require("../utils/musicPlayer");
 
 module.exports = {
 	name: "play",
-	run: (message, args) => {
-		const voiceChannel = message.member.voice.channel;
-		if (!voiceChannel)
-			return message.reply("❌ You must be in a voice channel!");
-
-		const files = fs.readdirSync(musicFolder).filter((f) => f.endsWith(".mp3"));
-		if (!files.length)
-			return message.channel.send("❌ No music files available.");
-
-		let songsToAdd = [];
-
-		if (args.length) {
-			const input = args.join(" ").trim().toLowerCase();
-			const num = parseInt(input, 10);
-
-			if (!isNaN(num) && num >= 1 && num <= files.length) {
-				songsToAdd.push(files[num - 1]);
-				message.channel.send(`➕Added to queue: **${files[num - 1]}**`);
-			} else {
-				// Find exact match ignoring case
-				const matchedFile = files.find((f) => f.toLowerCase() === input);
-
-				if (!matchedFile)
-					return message.channel.send(`❌ Song not found: ${args.join(" ")}`);
-
-				songsToAdd.push(matchedFile);
-				message.channel.send(`➕Added to queue: **${matchedFile}**`);
-			}
-		} else {
-			songsToAdd.push(...files);
-			message.channel.send(
-				`➕Added all songs in folder to queue(${files.length} songs)`
+	run: async (message, args) => {
+		if (!args.length) {
+			return message.channel.send(
+				"❌ Please provide the song number from !list"
 			);
 		}
 
-		addToQueue(songsToAdd, voiceChannel, message.channel);
+		// Example: get song file from your music folder
+		const songNumber = parseInt(args[0]);
+		const fs = require("fs");
+		const { musicFolder } = require("../utils/musicPlayer");
+		const files = fs.readdirSync(musicFolder).filter((f) => f.endsWith(".mp3"));
+
+		if (isNaN(songNumber) || songNumber < 1 || songNumber > files.length) {
+			return message.channel.send("❌ Invalid song number.");
+		}
+
+		const song = files[songNumber - 1];
+		const filePath = path.join(musicFolder, song);
+
+		// join voice channel
+		if (!message.member.voice.channel)
+			return message.channel.send("❌ You must join a voice channel first!");
+		const connection = joinVoiceChannel({
+			channelId: message.member.voice.channel.id,
+			guildId: message.guild.id,
+			adapterCreator: message.guild.voiceAdapterCreator,
+		});
+
+		// play audio
+		const player = createAudioPlayer();
+		const resource = createAudioResource(filePath);
+		connection.subscribe(player);
+		player.play(resource);
+
+		message.channel.send(`🎶 Now playing: **${song}**`);
+
+		// 🎵 Set rich presence
+		message.client.user.setPresence({
+			activities: [
+				{
+					name: song,
+					type: 2, // 2 = LISTENING
+				},
+			],
+			status: "online",
+		});
 	},
 };
