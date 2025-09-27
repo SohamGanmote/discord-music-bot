@@ -41,12 +41,12 @@ module.exports = {
 			new ActionRowBuilder().addComponents(
 				new ButtonBuilder()
 					.setCustomId("prev")
-					.setLabel("⬅ Prev")
+					.setLabel("Prev")
 					.setStyle(ButtonStyle.Primary)
 					.setDisabled(currentPage === 0),
 				new ButtonBuilder()
 					.setCustomId("next")
-					.setLabel("Next ➡")
+					.setLabel("Next")
 					.setStyle(ButtonStyle.Primary)
 					.setDisabled(currentPage === totalPages - 1)
 			);
