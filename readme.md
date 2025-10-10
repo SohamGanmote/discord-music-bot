@@ -4,6 +4,12 @@ A simple Discord bot that can play MP3 files in voice channels. Upload your favo
 
 ---
 
+## Screenshot
+
+![Discord Music Bot Screenshot](./screenshot.png)
+
+---
+
 ## Available Commands
 
 - 🎵 **!play [number|name]** - Play a song by its number in the list or by its filename
@@ -50,4 +56,5 @@ Watch this video for a step-by-step setup guide:
 ---
 
 Enjoy your music bot! 🎶
+
 
